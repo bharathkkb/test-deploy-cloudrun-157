@@ -12,7 +12,6 @@ env:
   IMAGE: foo
   GITHUB_SHA: ${{ github.sha }}
   DEPLOYMENT_NAME: bar
-  GCLOUD_PROJECT: ${{ secrets.GCP_PROJECT }}
 
 jobs:
   setup-build-publish-deploy:
@@ -35,7 +34,7 @@ jobs:
         id: deploy
         env:
           IMAGE_URL: ${{ env.REGISTRY_HOSTNAME }}/${{ env.GCP_PROJECT }}/${{ env.IMAGE }}:latest
-        uses: GoogleCloudPlatform/github-actions/deploy-cloudrun@master
+        uses: GoogleCloudPlatform/github-actions/deploy-cloudrun@cloudrun-projectid-bug
         with:
           #credentials: ${{ secrets.GCP_SA_KEY }}
           image: ${{ env.IMAGE_URL }}
