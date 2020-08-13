@@ -1,0 +1,44 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  GCP_REGION: us-central1
+  REGISTRY_HOSTNAME: gcr.io
+  IMAGE: foo
+  GITHUB_SHA: ${{ github.sha }}
+  DEPLOYMENT_NAME: bar
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Google Cloud CLI (gcloud)
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '303.0.0'
+          project_id: ${{ env.GCP_PROJECT }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Deploy
+        id: deploy
+        env:
+          IMAGE_URL: ${{ env.REGISTRY_HOSTNAME }}/${{ env.GCP_PROJECT }}/${{ env.IMAGE }}:latest
+        uses: GoogleCloudPlatform/github-actions/deploy-cloudrun@master
+        with:
+          #credentials: ${{ secrets.GCP_SA_KEY }}
+          image: ${{ env.IMAGE_URL }}
+          service: ${{ env.DEPLOYMENT_NAME }}
+
+      - name: Test API Endpoint
+        run: curl -sSI "${{ steps.deploy.outputs.url }}"
