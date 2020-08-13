@@ -12,6 +12,7 @@ env:
   IMAGE: foo
   GITHUB_SHA: ${{ github.sha }}
   DEPLOYMENT_NAME: bar
+  GCLOUD_PROJECT: ${{ secrets.GCP_PROJECT }}
 
 jobs:
   setup-build-publish-deploy:
